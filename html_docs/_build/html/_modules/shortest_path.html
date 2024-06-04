@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>shortest_path &mdash; Maze 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=8d563738"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Maze
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Maze</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">shortest_path</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for shortest_path</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="find_shortest_path">
+<a class="viewcode-back" href="../shortest_path.html#shortest_path.find_shortest_path">[docs]</a>
+<span class="k">def</span> <span class="nf">find_shortest_path</span><span class="p">(</span><span class="n">matrix1</span><span class="p">,</span> <span class="n">matrix2</span><span class="p">,</span> <span class="n">start_point</span><span class="p">,</span> <span class="n">end_point</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Функция для нахождения кратчайшего пути из одной точки лабиринта в другую.</span>
+<span class="sd">    Использует волновой алгоритм для нахождения кратчайшего пути</span>
+
+<span class="sd">    :param matrix1:  матрица значений ячеек, которые имеют (1) или не имеют (0) правую стенку</span>
+<span class="sd">    :param matrix2: матрица значений ячеек, которые имеют (1) или не имеют (0) нижнюю стенку</span>
+<span class="sd">    :param start_point: координаты начальной точки в формате индекса стартовой ячейк (х, у)</span>
+<span class="sd">    :param end_point: короодинаты конечной точки в формате индекса последней ячейки (х, у)</span>
+
+<span class="sd">    :return: list(tuple) список координат точек для построения кратчайшего пути</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">start_point</span> <span class="o">==</span> <span class="n">end_point</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">start_point</span><span class="p">,</span> <span class="n">end_point</span><span class="p">]</span>
+    <span class="n">path_matrix</span> <span class="o">=</span> <span class="n">make_path_matrix</span><span class="p">(</span><span class="n">matrix1</span><span class="p">,</span> <span class="n">matrix2</span><span class="p">,</span> <span class="n">start_point</span><span class="p">,</span> <span class="n">end_point</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="p">[</span><span class="n">end_point</span><span class="p">]</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="n">path_matrix</span><span class="p">[</span><span class="n">end_point</span><span class="p">]</span>
+    <span class="n">steps</span> <span class="o">=</span> <span class="p">[(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+    <span class="k">while</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">end_point</span>
+        <span class="n">new_steps</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i_s</span><span class="p">,</span> <span class="n">j_s</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">matrix1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">i</span> <span class="o">+</span> <span class="n">i_s</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">matrix1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">j</span> <span class="o">+</span> <span class="n">j_s</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">matrix2</span><span class="p">[</span><span class="n">i_s</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_s</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">i_s</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">j_s</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">new_steps</span><span class="o">.</span><span class="n">remove</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">matrix2</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">in</span> <span class="n">new_steps</span><span class="p">:</span>
+                    <span class="n">new_steps</span><span class="o">.</span><span class="n">remove</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">matrix1</span><span class="p">[</span><span class="n">i_s</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">j_s</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">i_s</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">j_s</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">new_steps</span><span class="o">.</span><span class="n">remove</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">matrix1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">in</span> <span class="n">new_steps</span><span class="p">:</span>
+                    <span class="n">new_steps</span><span class="o">.</span><span class="n">remove</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i_step</span><span class="p">,</span> <span class="n">j_step</span> <span class="ow">in</span> <span class="n">new_steps</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&gt;</span> <span class="n">i</span> <span class="o">+</span> <span class="n">i_step</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">+</span> <span class="n">i_step</span> <span class="o">&gt;=</span> <span class="n">matrix1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="ow">or</span> <span class="mi">0</span> <span class="o">&gt;</span> <span class="n">j</span> <span class="o">+</span> <span class="n">j_step</span> <span class="ow">or</span> <span class="n">j</span> <span class="o">+</span> <span class="n">j_step</span> <span class="o">&gt;=</span> <span class="n">matrix1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> \
+                    <span class="ow">or</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">i_step</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="n">j_step</span><span class="p">)</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">path_matrix</span><span class="p">[</span><span class="n">end_point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">i_step</span><span class="p">,</span> <span class="n">end_point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">j_step</span><span class="p">]</span> <span class="o">==</span> <span class="n">path_matrix</span><span class="p">[</span><span class="n">end_point</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">end_point</span> <span class="o">=</span> <span class="p">(</span><span class="n">end_point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">i_step</span><span class="p">,</span> <span class="n">end_point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">j_step</span><span class="p">)</span>
+                <span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">end_point</span><span class="p">)</span>
+                <span class="n">count</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="k">break</span>
+    <span class="c1"># print(path)</span>
+    <span class="k">return</span> <span class="n">path</span></div>
+
+
+<div class="viewcode-block" id="make_path_matrix">
+<a class="viewcode-back" href="../shortest_path.html#shortest_path.make_path_matrix">[docs]</a>
+<span class="k">def</span> <span class="nf">make_path_matrix</span><span class="p">(</span><span class="n">matrix1</span><span class="p">,</span> <span class="n">matrix2</span><span class="p">,</span> <span class="n">start_point</span><span class="p">,</span> <span class="n">end_point</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Функция волнового алгоритма для заполнения матрицы значениями,</span>
+<span class="sd">    помогающими найти кратчайших путь от одной точки до другой</span>
+
+
+<span class="sd">    :param matrix1:  матрица значений ячеек, которые имеют (1) или не имеют (0) правую стенку</span>
+<span class="sd">    :param matrix2: матрица значений ячеек, которые имеют (1) или не имеют (0) нижнюю стенку</span>
+<span class="sd">    :param start_point: координаты начальной точки в формате индекса стартовой ячейк (х, у)</span>
+<span class="sd">    :param end_point: короодинаты конечной точки в формате индекса последней ячейки (х, у)</span>
+
+<span class="sd">    :return: np.matrix матрица волнового алгоритма</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">steps</span> <span class="o">=</span> <span class="p">[(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+    <span class="n">step_stack</span> <span class="o">=</span> <span class="p">[</span><span class="n">start_point</span><span class="p">]</span>
+    <span class="n">tmp_stack</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">path_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">matrix1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">matrix1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
+    <span class="n">step_count</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">path_matrix</span><span class="p">[</span><span class="o">*</span><span class="n">start_point</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_count</span>
+    <span class="n">stop_flag</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">visited</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">visited</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">start_point</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">stop_flag</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">start_point</span> <span class="ow">in</span> <span class="n">step_stack</span><span class="p">:</span>
+            <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">start_point</span>
+            <span class="n">step_count</span> <span class="o">=</span> <span class="n">path_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">visited</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">start_point</span><span class="p">)</span>
+            <span class="n">new_steps</span> <span class="o">=</span> <span class="n">steps</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">matrix1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">new_steps</span><span class="o">.</span><span class="n">remove</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">matrix2</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">new_steps</span><span class="o">.</span><span class="n">remove</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">i_step</span><span class="p">,</span> <span class="n">j_step</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">((</span><span class="mi">0</span> <span class="o">&gt;</span> <span class="n">i</span> <span class="o">+</span> <span class="n">i_step</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">+</span> <span class="n">i_step</span> <span class="o">&gt;=</span> <span class="n">path_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="ow">or</span> <span class="mi">0</span> <span class="o">&gt;</span> <span class="n">j</span> <span class="o">+</span> <span class="n">j_step</span> <span class="ow">or</span> <span class="n">j</span> <span class="o">+</span> <span class="n">j_step</span> <span class="o">&gt;=</span> <span class="n">path_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                        <span class="ow">and</span> <span class="p">(</span><span class="n">i_step</span><span class="p">,</span> <span class="n">j_step</span><span class="p">)</span> <span class="ow">in</span> <span class="n">new_steps</span><span class="p">):</span>
+                    <span class="n">new_steps</span><span class="o">.</span><span class="n">remove</span><span class="p">((</span><span class="n">i_step</span><span class="p">,</span> <span class="n">j_step</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">i_step</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="n">j_step</span><span class="p">)</span> <span class="ow">in</span> <span class="n">visited</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i_step</span><span class="p">,</span> <span class="n">j_step</span><span class="p">)</span> <span class="ow">in</span> <span class="n">new_steps</span><span class="p">:</span>
+                    <span class="n">new_steps</span><span class="o">.</span><span class="n">remove</span><span class="p">((</span><span class="n">i_step</span><span class="p">,</span> <span class="n">j_step</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">i_step</span><span class="p">,</span> <span class="n">j_step</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">matrix1</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">i_step</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="n">j_step</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i_step</span><span class="p">,</span> <span class="n">j_step</span><span class="p">)</span> <span class="ow">in</span> <span class="n">new_steps</span><span class="p">:</span>
+                    <span class="n">new_steps</span><span class="o">.</span><span class="n">remove</span><span class="p">((</span><span class="n">i_step</span><span class="p">,</span> <span class="n">j_step</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">i_step</span><span class="p">,</span> <span class="n">j_step</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">matrix2</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">i_step</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="n">j_step</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="p">(</span><span class="n">i_step</span><span class="p">,</span> <span class="n">j_step</span><span class="p">)</span> <span class="ow">in</span> <span class="n">new_steps</span><span class="p">:</span>
+                    <span class="n">new_steps</span><span class="o">.</span><span class="n">remove</span><span class="p">((</span><span class="n">i_step</span><span class="p">,</span> <span class="n">j_step</span><span class="p">))</span>
+
+
+            <span class="k">for</span> <span class="n">i_step</span><span class="p">,</span> <span class="n">j_step</span> <span class="ow">in</span> <span class="n">new_steps</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">start_point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">i_step</span><span class="p">,</span> <span class="n">start_point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">j_step</span><span class="p">)</span> <span class="o">==</span> <span class="n">end_point</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">visited</span><span class="p">)</span> <span class="o">==</span> <span class="n">matrix1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">matrix1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">stop_flag</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="n">path_matrix</span><span class="p">[</span><span class="n">start_point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">i_step</span><span class="p">,</span> <span class="n">start_point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">j_step</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_count</span>
+                    <span class="k">break</span>
+                <span class="n">path_matrix</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">i_step</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="n">j_step</span><span class="p">]</span> <span class="o">=</span> <span class="n">step_count</span>
+                <span class="n">tmp_stack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span> <span class="o">+</span> <span class="n">i_step</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="n">j_step</span><span class="p">))</span>
+        <span class="n">step_stack</span> <span class="o">=</span> <span class="n">tmp_stack</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">tmp_stack</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">path_matrix</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">matrix1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+    <span class="n">matrix2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">find_shortest_path</span><span class="p">(</span><span class="n">matrix1</span><span class="p">,</span> <span class="n">matrix2</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Taleayos, Cathyphi, Twilawal.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
